@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内部资料 | 会员专享</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            perspective: 1000px;
+        }
+        
+        .card {
+            background: rgba(15, 20, 30, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+        
+        /* 登录页面样式 */
+        #login-page {
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .vip-badge {
+            position: absolute;
+            top: -15px;
+            right: 0;
+            background: linear-gradient(45deg, #ffd700, #ffb400);
+            color: #8a6d00;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(255, 180, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            box-shadow: 0 0 30px rgba(0, 114, 255, 0.6);
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #ffffff, #aaccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            color: #aaccff;
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5d9bff;
+            font-size: 18px;
+        }
+        
+        input[type="password"] {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            background: rgba(10, 15, 30, 0.7);
+            border: 2px solid rgba(92, 155, 255, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        input[type="password"]:focus {
+            border-color: #5d9bff;
+            box-shadow: 0 0 15px rgba(93, 155, 255, 0.4);
+            background: rgba(15, 25, 45, 0.8);
+        }
+        
+        input::placeholder {
+            color: rgba(200, 210, 255, 0.6);
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #5d9bff, #0072ff);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+            transition: all 0.6s ease;
+        }
+        
+        .btn:hover::after {
+            transform: rotate(30deg) translate(20%, 20%);
+        }
+        
+        .error {
+            color: #ff6b6b;
+            margin-top: 15px;
+            min-height: 20px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .error.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 选择页面样式 */
+        #selection-page {
+            display: none;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #aaccff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+        
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .page-title i {
+            color: #5d9bff;
+            background: rgba(93, 155, 255, 0.2);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .option-btn {
+            background: rgba(20, 30, 50, 0.7);
+            border: 1px solid rgba(92, 155, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 45, 70, 0.8);
+            border-color: rgba(92, 155, 255, 0.4);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .option-btn:active {
+            transform: translateY(0);
+        }
+        
+        .option-btn .number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #5d9bff, #aaccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .option-btn .label {
+            font-size: 14px;
+            color: rgba(200, 210, 255, 0.8);
+        }
+        
+        .option-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(93, 155, 255, 0.1), transparent);
+            z-index: -1;
+        }
+        
+        /* 受限访问样式 */
+        .restricted {
+            background: rgba(30, 20, 30, 0.5);
+            border: 1px solid rgba(150, 50, 50, 0.3);
+            cursor: not-allowed;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .restricted::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+        
+        .restricted .number, 
+        .restricted .label {
+            position: relative;
+            z-index: 2;
+            opacity: 0.5;
+        }
+        
+        .lock-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 100, 100, 0.8);
+            font-size: 24px;
+            z-index: 3;
+        }
+        
+        /* 图片页面样式 */
+        #image-page {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .image-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 15, 30, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .image-title {
+            font-size: 18px;
+            color: #aaccff;
+        }
+        
+        .image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        #secret-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .image-controls {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            background: rgba(10, 15, 30, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-btn {
+            background: rgba(20, 30, 50, 0.7);
+            border: 1px solid rgba(92, 155, 255, 0.2);
+            color: #aaccff;
+            border-radius: 10px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-btn:hover {
+            background: rgba(30, 45, 70, 0.8);
+            border-color: rgba(92, 155, 255, 0.4);
+        }
+        
+        /* 背景装饰元素 */
+        .bg-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(93, 155, 255, 0.15), transparent 70%);
+            filter: blur(20px);
+        }
+        
+        .bg-element:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            right: -50px;
+        }
+        
+        .bg-element:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            bottom: -30px;
+            left: -30px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .card {
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+        }
+        
+        /* 访问权限提示 */
+        .access-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(30, 40, 60, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(92, 155, 255, 0.2);
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .access-info i {
+            color: #5d9bff;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-inner">
+                <div class="bg-elements">
+                    <div class="bg-element"></div>
+                    <div class="bg-element"></div>
+                </div>
+                
+                <!-- 登录页面 -->
+                <div id="login-page">
+                    <div class="header">
+                        <div class="vip-badge">会员专享</div>
+                        <div class="logo">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h1>内部资料</h1>
+                        <p class="subtitle">高级会员专属内容</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="password" placeholder="请输入访问密码" autocomplete="off">
+                    </div>
+                    
+                    <button class="btn" onclick="checkPassword()">
+                        <i class="fas fa-unlock-alt"></i> 会员登录
+                    </button>
+                    
+                    <div id="error" class="error"></div>
+                </div>
+                
+                <!-- 选择页面 -->
+                <div id="selection-page">
+                    <div class="back-btn" onclick="goBackToPassword()">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    
+                    <div class="page-title">
+                        <i class="fas fa-archive"></i>
+                        <span>机密档案库</span>
+                    </div>
+                    
+                    <div class="options" id="archives-container">
+                        <!-- 将动态生成10个选项 -->
+                    </div>
+                    
+                    <div class="access-info" id="access-info">
+                        <i class="fas fa-user-shield"></i>
+                        <span id="access-text">您拥有所有资料的访问权限</span>
+                    </div>
+                </div>
+                
+                <!-- 图片页面 -->
+                <div id="image-page">
+                    <div class="image-header">
+                        <div class="image-title" id="image-title">第001期</div>
+                        <div class="back-btn" onclick="goBackToSelection()">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="image-container">
+                        <img id="secret-image" src="" alt="机密资料">
+                    </div>
+                    
+                    <div class="image-controls">
+                        <button class="control-btn" onclick="goBackToSelection()">
+                            <i class="fas fa-arrow-left"></i> 返回列表
+                        </button>
+                        <button class="control-btn" onclick="downloadImage()">
+                            <i class="fas fa-download"></i> 保存图片
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 配置区域
+        const CONFIG = {
+            // 双密码设置
+            passwords: {
+                "888888": "full",  // 完全访问权限
+                "666666": "limited" // 受限访问权限
+            },
+            
+            // 十期资料配置
+            archives: {
+                "001": "https://img2.baidu.com/it/u=3222261187,2513416791&fm=253&app=138&f=JPEG?w=800&h=1428",
+                "002": "https://ss0.baidu.com/-Po3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c9fcc3cec3fdfc03510bd5f2d23f8794a4c2260c.jpg",
+                "003": "https://img.juxia.com/upload/201911/26/26110243d525fX19N4BsQldhs5y.png",
+                "004": "https://wenwen.soso.com/p/20090220/20090220165343-164607705.jpg",
+                "005": "https://img.juxia.com/upload/201911/26/26110243d525fX19N4BsQldhs5y.png",
+                "006": "https://pics3.baidu.com/feed/6a63f6246b600c333bed6b3e6085c208dbf9a185.jpeg?token=70a353d14f10d1ca5031fdefdcf00dd4",
+                "007": "https://img0.baidu.com/it/u=2235537439,3729449322&fm=253&fmt=auto&app=138&f=JPEG?w=320&h=460",
+                "008": "https://p0.itc.cn/q_70/images03/20210914/41646e205e9046ee8fade0aaa96bf4d6.jpeg",
+                "009": "https://p0.itc.cn/q_70/images03/20200720/97a5ea1a839e4ca9beba435977fd851a.png",
+                "010": "https://p9.itc.cn/q_70/images03/20220627/136b1772927745d9aa0e54c2035b804d.jpeg"
+            },
+            
+            // 受限访问权限只能访问005期
+            limitedAccess: ["005"]
+        };
+        
+        // 当前用户权限状态
+        let currentAccessLevel = "full";
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建十个选项按钮
+            const optionsContainer = document.getElementById('archives-container');
+            
+            for (let i = 1; i <= 10; i++) {
+                const archiveNum = String(i).padStart(3, '0');
+                const optionBtn = document.createElement('div');
+                optionBtn.className = 'option-btn';
+                optionBtn.id = `archive-${archiveNum}`;
+                optionBtn.innerHTML = `
+                    <div class="number">第${archiveNum}期</div>
+                    <div class="label">机密资料</div>
+                `;
+                optionBtn.onclick = () => showImage(archiveNum);
+                optionsContainer.appendChild(optionBtn);
+            }
+        });
+        
+        // 检查密码
+        function checkPassword() {
+            const input = document.getElementById("password").value;
+            const errorEl = document.getElementById("error");
+            
+            if (CONFIG.passwords[input]) {
+                // 设置当前访问权限
+                currentAccessLevel = CONFIG.passwords[input];
+                
+                // 更新界面显示
+                updateArchiveAccess();
+                
+                document.getElementById("login-page").style.display = "none";
+                document.getElementById("selection-page").style.display = "block";
+                errorEl.classList.remove('show');
+            } else {
+                errorEl.textContent = "密码错误，请重试";
+                errorEl.classList.add('show');
+                
+                // 添加抖动动画
+                document.querySelector(".card").animate([
+                    { transform: 'translateX(0)' },
+                    { transform: 'translateX(-15px)' },
+                    { transform: 'translateX(15px)' },
+                    { transform: 'translateX(-10px)' },
+                    { transform: 'translateX(10px)' },
+                    { transform: 'translateX(0)' }
+                ], {
+                    duration: 500
+                });
+            }
+        }
+        
+        // 根据权限更新档案访问状态
+        function updateArchiveAccess() {
+            const accessText = document.getElementById("access-text");
+            
+            if (currentAccessLevel === "limited") {
+                accessText.textContent = "您只能访问第005期资料";
+                
+                // 禁用所有非005期档案
+                for (let i = 1; i <= 10; i++) {
+                    const archiveNum = String(i).padStart(3, '0');
+                    const btn = document.getElementById(`archive-${archiveNum}`);
+                    
+                    if (archiveNum !== "005") {
+                        btn.classList.add('restricted');
+                        btn.innerHTML += '<div class="lock-icon"><i class="fas fa-lock"></i></div>';
+                        btn.onclick = null;
+                    }
+                }
+            } else {
+                accessText.textContent = "您拥有所有资料的访问权限";
+            }
+        }
+        
+        // 显示图片
+        function showImage(archiveNum) {
+            // 检查受限访问权限
+            if (currentAccessLevel === "limited" && !CONFIG.limitedAccess.includes(archiveNum)) {
+                // 显示错误提示
+                const errorEl = document.getElementById("error");
+                errorEl.textContent = "您没有权限访问该资料";
+                errorEl.classList.add('show');
+                
+                // 短暂显示错误提示
+                setTimeout(() => {
+                    errorEl.classList.remove('show');
+                }, 2000);
+                return;
+            }
+            
+            const imgUrl = CONFIG.archives[archiveNum];
+            if (!imgUrl) return;
+            
+            document.getElementById("selection-page").style.display = "none";
+            document.getElementById("image-page").style.display = "flex";
+            document.getElementById("secret-image").src = imgUrl;
+            document.getElementById("image-title").textContent = `第${archiveNum}期`;
+        }
+        
+        // 返回选择页面
+        function goBackToSelection() {
+            document.getElementById("image-page").style.display = "none";
+            document.getElementById("selection-page").style.display = "block";
+        }
+        
+        // 返回密码页面
+        function goBackToPassword() {
+            document.getElementById("selection-page").style.display = "none";
+            document.getElementById("login-page").style.display = "block";
+            document.getElementById("password").value = "";
+            const errorEl = document.getElementById("error");
+            errorEl.textContent = "";
+            errorEl.classList.remove('show');
+            
+            // 重置访问权限显示
+            const archiveButtons = document.querySelectorAll('.option-btn');
+            archiveButtons.forEach(btn => {
+                btn.classList.remove('restricted');
+                const lockIcon = btn.querySelector('.lock-icon');
+                if (lockIcon) lockIcon.remove();
+            });
+        }
+        
+        // 下载图片
+        function downloadImage() {
+            const imgUrl = document.getElementById("secret-image").src;
+            const archiveNum = document.getElementById("image-title").textContent.replace('第', '').replace('期', '');
+            
+            const link = document.createElement('a');
+            link.href = imgUrl;
+            link.download = `内部资料-第${archiveNum}期.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 支持按回车键提交密码
+        document.getElementById("password").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") checkPassword();
+        });
+    </script>
+</body>
+</html>
