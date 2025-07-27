@@ -233,7 +233,7 @@
         
         .page-title {
             font-size: 24px;
-            margin-bottom: 25px;
+            margin-bottom: 10px; /* 减少底部边距，为权限提示留出空间 */
             display: flex;
             align-items: center;
             gap: 10px;
@@ -254,6 +254,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            margin-top: 20px; /* 增加顶部边距，与权限提示分开 */
         }
         
         .option-btn {
@@ -457,13 +458,15 @@
         
         /* 访问权限提示 */
         .access-info {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 5px; /* 减少顶部边距，使其更靠近标题 */
+            margin-bottom: 15px; /* 增加底部边距，与选项分开 */
+            padding: 12px 15px;
             background: rgba(30, 40, 60, 0.5);
             border-radius: 12px;
             border: 1px solid rgba(92, 155, 255, 0.2);
             font-size: 14px;
             text-align: center;
+            color: #aaccff;
         }
         
         .access-info i {
@@ -530,13 +533,14 @@
                         <span>机密档案库</span>
                     </div>
                     
-                    <div class="options" id="archives-container">
-                        <!-- 将动态生成档案选项 -->
-                    </div>
-                    
+                    <!-- 访问权限提示移动到标题下方 -->
                     <div class="access-info" id="access-info">
                         <i class="fas fa-user-shield"></i>
                         <span id="access-text">您拥有所有资料的访问权限</span>
+                    </div>
+                    
+                    <div class="options" id="archives-container">
+                        <!-- 将动态生成档案选项 -->
                     </div>
                 </div>
                 
@@ -606,16 +610,12 @@
                 "007": "https://img0.baidu.com/it/u=2235537439,3729449322&fm=253&fmt=auto&app=138&f=JPEG?w=320&h=460",
                 "008": "https://p0.itc.cn/q_70/images03/20210914/41646e205e9046ee8fade0aaa96bf4d6.jpeg",
                 "009": "https://p0.itc.cn/q_70/images03/20200720/97a5ea1a839e4ca9beba435977fd851a.png",
-                "010": "https://p9.itc.cn/q_70/images03/20220627/136b1772927745d9aa0e54c2035b804d.jpeg"
-
-
-
-
+                "050": "https://p9.itc.cn/q_70/images03/20220627/136b1772927745d9aa0e54c2035b804d.jpeg"
             },
             
             // ===== 受限访问配置 =====
             // 定义受限权限下可以访问的期号（可设置多个）
-            limitedAccess: ["002", "003", "010"]  // 可访问005、007和009期
+            limitedAccess: ["002", "003", "050"]  // 可访问005、007和009期
         };
         
         /*******************************************
