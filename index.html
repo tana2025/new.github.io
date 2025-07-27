@@ -470,6 +470,17 @@
             color: #5d9bff;
             margin-right: 8px;
         }
+        
+        /* 刷新提示 */
+        .refresh-notice {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(200, 200, 255, 0.4);
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -502,6 +513,10 @@
                     </button>
                     
                     <div id="error" class="error"></div>
+                    
+                    <div class="refresh-notice">
+                        每次返回登录界面系统将自动重置状态
+                    </div>
                 </div>
                 
                 <!-- 选择页面 -->
@@ -516,7 +531,7 @@
                     </div>
                     
                     <div class="options" id="archives-container">
-                        <!-- 将动态生成10个选项 -->
+                        <!-- 将动态生成档案选项 -->
                     </div>
                     
                     <div class="access-info" id="access-info">
@@ -552,62 +567,106 @@
     </div>
 
     <script>
-        // 配置区域
-        const CONFIG = {
-            // 双密码设置
+        /*******************************************
+         *            配置区域（请修改这里）            *
+         * 所有可配置项都集中在此处，方便您随时修改         *
+         *******************************************/
+        
+        const SYSTEM_CONFIG = {
+            // ===== 系统标题配置 =====
+            systemTitle: "内部资料",
+            systemSubtitle: "高级会员专属内容",
+            
+            // ===== 密码权限配置 =====
+            // 格式: "密码": "权限类型"
             passwords: {
-                "888888": "full",  // 完全访问权限
-                "555555": "limited" // 受限访问权限
+                "123456": "full",     // 完全访问权限
+                "234567": "limited"  // 受限访问权限
             },
             
-            // 十期资料配置
+            // ===== 档案范围配置 =====
+            // 修改start和end可以调整期号范围（如158-168期）
+            archiveRange: {
+                start: 1,   // 起始期号
+                end: 365,    // 结束期号
+                prefix: "第",  // 期号前缀
+                suffix: "期"   // 期号后缀
+            },
+            
+            // ===== 档案内容配置 =====
+            // 格式： "期号": "图片URL"
+            // 期号必须与archiveRange中的期号对应（如"001"对应1）
             archives: {
                 "001": "https://img2.baidu.com/it/u=3222261187,2513416791&fm=253&app=138&f=JPEG?w=800&h=1428",
                 "002": "https://ss0.baidu.com/-Po3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/c9fcc3cec3fdfc03510bd5f2d23f8794a4c2260c.jpg",
                 "003": "https://img.juxia.com/upload/201911/26/26110243d525fX19N4BsQldhs5y.png",
                 "004": "https://wenwen.soso.com/p/20090220/20090220165343-164607705.jpg",
-                "005": "https://img1.baidu.com/it/u=3221712430,211295163&fm=253&app=138&f=JPEG?w=800&h=1069",
+                "005": "https://img.juxia.com/upload/201911/26/26110243d525fX19N4BsQldhs5y.png",
                 "006": "https://pics3.baidu.com/feed/6a63f6246b600c333bed6b3e6085c208dbf9a185.jpeg?token=70a353d14f10d1ca5031fdefdcf00dd4",
                 "007": "https://img0.baidu.com/it/u=2235537439,3729449322&fm=253&fmt=auto&app=138&f=JPEG?w=320&h=460",
                 "008": "https://p0.itc.cn/q_70/images03/20210914/41646e205e9046ee8fade0aaa96bf4d6.jpeg",
                 "009": "https://p0.itc.cn/q_70/images03/20200720/97a5ea1a839e4ca9beba435977fd851a.png",
                 "010": "https://p9.itc.cn/q_70/images03/20220627/136b1772927745d9aa0e54c2035b804d.jpeg"
+
+
+
+
             },
             
-            // 受限访问权限只能访问005期
-            limitedAccess: ["005"]
+            // ===== 受限访问配置 =====
+            // 定义受限权限下可以访问的期号（可设置多个）
+            limitedAccess: ["002", "003", "010"]  // 可访问005、007和009期
         };
+        
+        /*******************************************
+         *              系统功能代码                *
+         * 以下代码实现系统功能，一般无需修改          *
+         *******************************************/
         
         // 当前用户权限状态
         let currentAccessLevel = "full";
         
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
-            // 创建十个选项按钮
-            const optionsContainer = document.getElementById('archives-container');
+            // 更新系统标题
+            document.querySelector('h1').textContent = SYSTEM_CONFIG.systemTitle;
+            document.querySelector('.subtitle').textContent = SYSTEM_CONFIG.systemSubtitle;
             
-            for (let i = 1; i <= 10; i++) {
+            // 创建档案按钮
+            createArchiveButtons();
+        });
+        
+        // 创建档案按钮
+        function createArchiveButtons() {
+            const optionsContainer = document.getElementById('archives-container');
+            optionsContainer.innerHTML = '';
+            
+            const { start, end, prefix, suffix } = SYSTEM_CONFIG.archiveRange;
+            
+            for (let i = start; i <= end; i++) {
                 const archiveNum = String(i).padStart(3, '0');
+                const displayNum = `${prefix}${archiveNum}${suffix}`;
+                
                 const optionBtn = document.createElement('div');
                 optionBtn.className = 'option-btn';
                 optionBtn.id = `archive-${archiveNum}`;
                 optionBtn.innerHTML = `
-                    <div class="number">第${archiveNum}期</div>
+                    <div class="number">${displayNum}</div>
                     <div class="label">机密资料</div>
                 `;
                 optionBtn.onclick = () => showImage(archiveNum);
                 optionsContainer.appendChild(optionBtn);
             }
-        });
+        }
         
         // 检查密码
         function checkPassword() {
             const input = document.getElementById("password").value;
             const errorEl = document.getElementById("error");
             
-            if (CONFIG.passwords[input]) {
+            if (SYSTEM_CONFIG.passwords[input]) {
                 // 设置当前访问权限
-                currentAccessLevel = CONFIG.passwords[input];
+                currentAccessLevel = SYSTEM_CONFIG.passwords[input];
                 
                 // 更新界面显示
                 updateArchiveAccess();
@@ -636,16 +695,22 @@
         // 根据权限更新档案访问状态
         function updateArchiveAccess() {
             const accessText = document.getElementById("access-text");
+            const { prefix, suffix } = SYSTEM_CONFIG.archiveRange;
             
             if (currentAccessLevel === "limited") {
-                accessText.textContent = "您只能访问第005期资料";
+                // 生成可访问的期号文本
+                const accessibleArchives = SYSTEM_CONFIG.limitedAccess.map(num => {
+                    return `${prefix}${num}${suffix}`;
+                }).join('、');
                 
-                // 禁用所有非005期档案
-                for (let i = 1; i <= 10; i++) {
+                accessText.textContent = `您只能访问 ${accessibleArchives} 资料`;
+                
+                // 禁用所有非授权档案
+                for (let i = SYSTEM_CONFIG.archiveRange.start; i <= SYSTEM_CONFIG.archiveRange.end; i++) {
                     const archiveNum = String(i).padStart(3, '0');
                     const btn = document.getElementById(`archive-${archiveNum}`);
                     
-                    if (archiveNum !== "005") {
+                    if (!SYSTEM_CONFIG.limitedAccess.includes(archiveNum)) {
                         btn.classList.add('restricted');
                         btn.innerHTML += '<div class="lock-icon"><i class="fas fa-lock"></i></div>';
                         btn.onclick = null;
@@ -659,7 +724,7 @@
         // 显示图片
         function showImage(archiveNum) {
             // 检查受限访问权限
-            if (currentAccessLevel === "limited" && !CONFIG.limitedAccess.includes(archiveNum)) {
+            if (currentAccessLevel === "limited" && !SYSTEM_CONFIG.limitedAccess.includes(archiveNum)) {
                 // 显示错误提示
                 const errorEl = document.getElementById("error");
                 errorEl.textContent = "您没有权限访问该资料";
@@ -672,13 +737,16 @@
                 return;
             }
             
-            const imgUrl = CONFIG.archives[archiveNum];
+            const imgUrl = SYSTEM_CONFIG.archives[archiveNum];
             if (!imgUrl) return;
+            
+            const { prefix, suffix } = SYSTEM_CONFIG.archiveRange;
+            const displayTitle = `${prefix}${archiveNum}${suffix}`;
             
             document.getElementById("selection-page").style.display = "none";
             document.getElementById("image-page").style.display = "flex";
             document.getElementById("secret-image").src = imgUrl;
-            document.getElementById("image-title").textContent = `第${archiveNum}期`;
+            document.getElementById("image-title").textContent = displayTitle;
         }
         
         // 返回选择页面
@@ -687,15 +755,16 @@
             document.getElementById("selection-page").style.display = "block";
         }
         
-        // 返回密码页面
+        // 返回密码页面（重置整个系统状态）
         function goBackToPassword() {
+            // 完全重置系统状态
             document.getElementById("selection-page").style.display = "none";
             document.getElementById("login-page").style.display = "block";
             document.getElementById("password").value = "";
             const errorEl = document.getElementById("error");
             errorEl.textContent = "";
             errorEl.classList.remove('show');
-            
+
             // 重置访问权限显示
             const archiveButtons = document.querySelectorAll('.option-btn');
             archiveButtons.forEach(btn => {
@@ -703,16 +772,27 @@
                 const lockIcon = btn.querySelector('.lock-icon');
                 if (lockIcon) lockIcon.remove();
             });
+
+            // 重置当前访问权限状态
+            currentAccessLevel = "full";
+            
+            // 重置访问提示
+            document.getElementById("access-text").textContent = "您拥有所有资料的访问权限";
+            
+            // 重新创建档案按钮（确保状态完全重置）
+            createArchiveButtons();
         }
         
         // 下载图片
         function downloadImage() {
             const imgUrl = document.getElementById("secret-image").src;
-            const archiveNum = document.getElementById("image-title").textContent.replace('第', '').replace('期', '');
+            const archiveNum = document.getElementById("image-title").textContent
+                .replace(SYSTEM_CONFIG.archiveRange.prefix, '')
+                .replace(SYSTEM_CONFIG.archiveRange.suffix, '');
             
             const link = document.createElement('a');
             link.href = imgUrl;
-            link.download = `内部资料-第${archiveNum}期.jpg`;
+            link.download = `${SYSTEM_CONFIG.systemTitle}-${SYSTEM_CONFIG.archiveRange.prefix}${archiveNum}${SYSTEM_CONFIG.archiveRange.suffix}.jpg`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
